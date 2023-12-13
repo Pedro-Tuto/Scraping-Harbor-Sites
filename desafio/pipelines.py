@@ -13,6 +13,8 @@ from scrapy.exceptions import DropItem
 # useful for handling different item types with a single interface
 from itemadapter import ItemAdapter
 
+from mysql_data import *
+
 
 class ActivityPipeline:
     def process_item(self, item, spider):
@@ -23,7 +25,7 @@ class JsonWriterPipeline:
     def open_spider(self, spider):
         self.file = open("relatorio.json", "w")
         self.file.write("[")
-        self.items_written = False  # Add this line
+        self.items_written = False
 
     def close_spider(self, spider):
         if self.items_written:
@@ -34,12 +36,12 @@ class JsonWriterPipeline:
     def process_item(self, item, spider):
         line = json.dumps(dict(item), ensure_ascii=False) + ",\n"
         self.file.write(line)
-        self.items_written = True  # Add this line
+        self.items_written = True
         return item
 
     def remove_trailing_comma(self):
-        self.file.seek(self.file.tell() - 2)  # Move the cursor two positions back
-        self.file.truncate()  # Remove the comma and newline
+        self.file.seek(self.file.tell() - 2)
+        self.file.truncate()
 
 
 class CSVWriterPipeline:
@@ -69,17 +71,17 @@ class CSVWriterPipeline:
                 item["daily_volume_in_tons"],
                 item["daily_volume_in_movs"],
             ]
-        )  # namedtuple breaks convention public fields have single underscore
+        )
         return item
 
 
 class MySqlPipeline:
     def __init__(self):
         self.conn = mysql.connector.connect(
-            host="localhost",
-            user="root",
-            password="mysqlroot",
-            database="db_merchandise",
+            host=MYSQL_HOST,
+            user=MYSQL_USER,
+            password=MYSQL_PASSWORD,
+            database=MYSQL_DATABASE,
         )
 
         self.cur = self.conn.cursor()
