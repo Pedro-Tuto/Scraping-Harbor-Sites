@@ -86,7 +86,7 @@ class MySqlPipeline:
 
         self.cur = self.conn.cursor()
 
-        self.cur.execute("""DROP TABLE merchandise""")
+        self.cur.execute("""DROP TABLE IF EXISTS merchandise""")
 
         self.cur.execute(
             """
